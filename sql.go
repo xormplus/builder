@@ -135,13 +135,17 @@ func ConvertToBoundSQL(sql string, args []interface{}) (string, error) {
 	return buf.String(), nil
 }
 
-// ConvertToBoundSQL will convert SQL and args to a bound SQL
+// ConvertPlaceholder replaces the place holder ? to $1, $2 ... or :1, :2 ... according prefix
 func ConvertExprToBoundSQL(sql string, args []interface{}) (string, []interface{}, error) {
 	buf := strings.Builder{}
 	var i, j, start int
+	var ready = true
 	var sqlArgs []interface{}
 	for ; i < len(sql); i++ {
-		if sql[i] == '?' {
+		if sql[i] == '\'' && i > 0 && sql[i-1] != '\\' {
+			ready = !ready
+		}
+		if ready && sql[i] == '?' {
 			_, err := buf.WriteString(sql[start:i])
 			if err != nil {
 				return "", sqlArgs, err

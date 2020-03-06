@@ -20,9 +20,39 @@ const placeholderConvertedSQL = "SELECT a, b FROM table_a WHERE b_id=(SELECT id 
 const placeholderBoundSQL = "SELECT a, b FROM table_a WHERE b_id=(SELECT id FROM table_b WHERE b=1) AND id=2.1 AND c='3' AND d=4 AND e='5' AND f=true"
 
 func TestPlaceholderConverter(t *testing.T) {
-	newSQL, err := ConvertPlaceholder(placeholderConverterSQL, "$")
-	assert.NoError(t, err)
-	assert.EqualValues(t, placeholderConvertedSQL, newSQL)
+	var convertCases = []struct {
+		before, after string
+		mark          string
+	}{
+		{
+			before: placeholderConverterSQL,
+			after:  placeholderConvertedSQL,
+			mark:   "$",
+		},
+		{
+			before: "SELECT a, b, 'a?b' FROM table_a WHERE id=?",
+			after:  "SELECT a, b, 'a?b' FROM table_a WHERE id=:1",
+			mark:   ":",
+		},
+		{
+			before: "SELECT a, b, 'a\\'?b' FROM table_a WHERE id=?",
+			after:  "SELECT a, b, 'a\\'?b' FROM table_a WHERE id=$1",
+			mark:   "$",
+		},
+		{
+			before: "SELECT a, b, 'a\\'b' FROM table_a WHERE id=?",
+			after:  "SELECT a, b, 'a\\'b' FROM table_a WHERE id=$1",
+			mark:   "$",
+		},
+	}
+
+	for _, kase := range convertCases {
+		t.Run(kase.before, func(t *testing.T) {
+			newSQL, err := ConvertPlaceholder(kase.before, kase.mark)
+			assert.NoError(t, err)
+			assert.EqualValues(t, kase.after, newSQL)
+		})
+	}
 }
 
 func BenchmarkPlaceholderConverter(b *testing.B) {
