@@ -32,6 +32,15 @@ func TestBuilderInsert(t *testing.T) {
 	assert.Error(t, err)
 	assert.EqualValues(t, ErrNoColumnToInsert, err)
 	assert.EqualValues(t, "", sql)
+
+	sql, err = Insert(Eq{`a`: nil}).Into(`table1`).ToBoundSQL()
+	assert.NoError(t, err)
+	assert.EqualValues(t, `INSERT INTO table1 (a) Values (null)`, sql)
+
+	sql, args, err := Insert(Eq{`a`: nil, `b`: `str`}).Into(`table1`).ToSQL()
+	assert.NoError(t, err)
+	assert.EqualValues(t, `INSERT INTO table1 (a,b) Values (null,?)`, sql)
+	assert.EqualValues(t, []interface{}{`str`}, args)
 }
 
 func TestBuidlerInsert_Select(t *testing.T) {

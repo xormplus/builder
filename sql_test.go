@@ -212,4 +212,13 @@ func TestToSQLInjectionHarmlessDisposal(t *testing.T) {
 	sql, err := MySQL().Select("*").From("table1").Where(Cond(Eq{"name": "cat';truncate table table1;"})).ToBoundSQL()
 	assert.NoError(t, err)
 	assert.EqualValues(t, "SELECT * FROM table1 WHERE name='cat'';truncate table table1;'", sql)
+
+	sql, err = MySQL().Update(Eq{`a`: 1, `b`: nil}).From(`table1`).ToBoundSQL()
+	assert.NoError(t, err)
+	assert.EqualValues(t, "UPDATE table1 SET a=1,b=null", sql)
+
+	sql, args, err := MySQL().Update(Eq{`a`: 1, `b`: nil}).From(`table1`).ToSQL()
+	assert.NoError(t, err)
+	assert.EqualValues(t, "UPDATE table1 SET a=?,b=null", sql)
+	assert.EqualValues(t, []interface{}{1}, args)
 }
