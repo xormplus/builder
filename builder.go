@@ -261,7 +261,7 @@ func (b *Builder) ToSQL() (string, []interface{}, error) {
 		}
 	}
 
-	var sql = w.writer.String()
+	var sql = w.String()
 	var err error
 
 	switch b.dialect {
@@ -297,5 +297,5 @@ func (b *Builder) ToBoundSQL() (string, error) {
 		return "", err
 	}
 
-	return ConvertToBoundSQL(w.writer.String(), w.args)
+	return ConvertToBoundSQL(w.String(), w.args)
 }
