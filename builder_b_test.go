@@ -277,9 +277,8 @@ func randLimit(b *Builder) *Builder {
 	r := rand.Intn(1000) + 1
 	if r > 500 {
 		return b.Limit(r, 1000)
-	} else {
-		return b.Limit(r)
 	}
+	return b.Limit(r)
 }
 
 func randOrderBy(b *Builder) *Builder {
