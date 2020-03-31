@@ -11,7 +11,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/go-xorm/sqlfiddle"
+	"gitea.com/xorm/sqlfiddle"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -177,7 +177,6 @@ func TestReadPreparationSQLFromFile(t *testing.T) {
 	fmt.Println(sqlFromFile)
 }
 
-/*
 func TestNewFiddler(t *testing.T) {
 	sqlFromFile, err := readPreparationSQLFromFile("testdata/mysql_fiddle_data.sql")
 	assert.NoError(t, err)
@@ -197,7 +196,7 @@ func TestExecutableCheck(t *testing.T) {
 
 	err = f.executableCheck("SELECT * FROM table3")
 	assert.Error(t, err)
-}*/
+}
 
 func TestToSQLInDifferentDialects(t *testing.T) {
 	sql, args, err := Postgres().Select().From("table1").Where(Eq{"a": "1"}.And(Neq{"b": "100"})).ToSQL()

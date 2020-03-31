@@ -4,7 +4,12 @@
 
 package builder
 
-/*
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
 func TestBuilder_Limit4Mssql(t *testing.T) {
 	sqlFromFile, err := readPreparationSQLFromFile("testdata/mssql_fiddle_data.sql")
 	assert.NoError(t, err)
@@ -121,4 +126,4 @@ func TestBuilder_Limit4Oracle(t *testing.T) {
 	assert.NoError(t, err)
 	assert.EqualValues(t, "SELECT a,b,c FROM (SELECT a,b,c,ROWNUM RN FROM ((SELECT a,b,c FROM (SELECT * FROM (SELECT a,b,c,ROWNUM RN FROM table1 WHERE a<>'0' ORDER BY a ASC) at WHERE at.RN<=15) att WHERE att.RN>10) UNION ALL (SELECT a,b,c FROM (SELECT a,b,c,ROWNUM RN FROM table1 WHERE b<>'48' ORDER BY a DESC) at WHERE at.RN<=10)) at) at WHERE at.RN<=3", sql)
 	assert.NoError(t, f.executableCheck(sql))
-}*/
+}

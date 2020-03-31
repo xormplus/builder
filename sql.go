@@ -77,6 +77,7 @@ func noSQLQuoteNeeded(a interface{}) bool {
 	}
 
 	t := reflect.TypeOf(a)
+
 	switch t.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return true
@@ -136,60 +137,15 @@ func ConvertToBoundSQL(sql string, args []interface{}) (string, error) {
 }
 
 // ConvertPlaceholder replaces the place holder ? to $1, $2 ... or :1, :2 ... according prefix
-func ConvertExprToBoundSQL(sql string, args []interface{}) (string, []interface{}, error) {
+func ConvertPlaceholder(sql, prefix string) (string, error) {
 	buf := strings.Builder{}
 	var i, j, start int
 	var ready = true
-	var sqlArgs []interface{}
 	for ; i < len(sql); i++ {
 		if sql[i] == '\'' && i > 0 && sql[i-1] != '\\' {
 			ready = !ready
 		}
 		if ready && sql[i] == '?' {
-			_, err := buf.WriteString(sql[start:i])
-			if err != nil {
-				return "", sqlArgs, err
-			}
-			start = i + 1
-
-			if len(args) == j {
-				return "", sqlArgs, ErrNeedMoreArguments
-			}
-
-			arg := args[j]
-			if exprArg, ok := arg.(expr); ok {
-				arg = exprArg.sql
-				_, err = fmt.Fprint(&buf, arg)
-				if err != nil {
-					return "", sqlArgs, err
-				}
-				for i, _ := range exprArg.args {
-					sqlArgs = append(sqlArgs, exprArg.args[i])
-				}
-			} else {
-				_, err = fmt.Fprint(&buf, "?")
-				if err != nil {
-					return "", sqlArgs, err
-				}
-				sqlArgs = append(sqlArgs, arg)
-			}
-
-			j = j + 1
-		}
-	}
-	_, err := buf.WriteString(sql[start:])
-	if err != nil {
-		return "", sqlArgs, err
-	}
-	return buf.String(), sqlArgs, nil
-}
-
-// ConvertPlaceholder replaces ? to $1, $2 ... or :1, :2 ... according prefix
-func ConvertPlaceholder(sql, prefix string) (string, error) {
-	buf := strings.Builder{}
-	var i, j, start int
-	for ; i < len(sql); i++ {
-		if sql[i] == '?' {
 			if _, err := buf.WriteString(sql[start:i]); err != nil {
 				return "", err
 			}
